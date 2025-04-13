@@ -1,0 +1,27 @@
+.navbar {
+  background-color: #102e50;
+  height: 60px;
+  max-width: 100%;
+  padding: 0 100px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.navbar_link_wrapper {
+  height: 100%;
+  width: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar_link {
+  color: white;
+  font-style: normal;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.navbar_link:hover {
+  color: #f2f2f2;
+}
