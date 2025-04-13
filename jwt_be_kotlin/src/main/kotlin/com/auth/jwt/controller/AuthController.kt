@@ -29,14 +29,11 @@ class AuthController(private val authService: AuthService) {
         val jwt = authService.checkLogin(loginBody) ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
         val cookie = Cookie("jwt", jwt)
         cookie.isHttpOnly = true
-        response.setHeader(
-            "Set-Cookie",
-            "token=$jwt; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=3600"
-        )
+        response.addCookie(cookie)
         return ResponseEntity.ok().build()
     }
 
-    @GetMapping("/user")
+    @PostMapping("/user")
     fun user(@RequestBody emailBody: EmailDto, @CookieValue("jwt") jwtCookie: String?): ResponseEntity<Any> {
         if (jwtCookie == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()

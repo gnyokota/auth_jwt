@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(false);
   const router = useRouter();
 
   const fetchLogin = async (email: string, password: string) => {
@@ -22,6 +23,8 @@ const Login = () => {
       }),
     });
 
+    setError(!response.ok);
+
     if (!response.ok) {
       throw new Error("Failed to login user");
     }
@@ -32,6 +35,7 @@ const Login = () => {
 
     try {
       await fetchLogin(email, password);
+      localStorage.setItem("email", email);
       await router.push("/");
     } catch (error) {
       console.error("Login failed:", error);
@@ -70,6 +74,11 @@ const Login = () => {
         <button className={styles.login_button} type="submit">
           Login
         </button>
+        {error && (
+          <span className={styles.login_error_message}>
+            Something went wrong. Please try again.
+          </span>
+        )}
       </form>
     </div>
   );
