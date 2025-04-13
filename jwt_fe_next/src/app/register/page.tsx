@@ -2,17 +2,64 @@
 
 import { useState } from "react";
 import styles from "./register.module.css";
+import { useRouter } from "next/navigation";
 
 const Register = () => {
   const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState({
+    password: "",
+    confirmPassword: "",
+  });
+  const [error, setError] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const fetchRegister = async (
+    name: string,
+    email: string,
+    password: string
+  ) => {
+    const response = await fetch("http://localhost:8080/v1/api/register", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        password,
+      }),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to register user");
+    }
+    return response.json();
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("name:", name);
-    console.log("Username:", username);
-    console.log("Password:", password);
+    if (password.password !== password.confirmPassword) {
+      setError(true);
+      return;
+    }
+
+    await fetchRegister(name, email, password.password);
+
+    await router.push("/login");
+  };
+
+  const handleChange = (value: string, name: string) => {
+    if (name === "name") {
+      setName(value);
+    } else if (name === "email") {
+      setEmail(value);
+    } else if (name === "password") {
+      setPassword({ ...password, password: value });
+    } else if (name === "confirmPassword") {
+      setPassword({ ...password, confirmPassword: value });
+    }
+    setError(false);
   };
 
   return (
@@ -20,27 +67,29 @@ const Register = () => {
       <form onSubmit={handleSubmit} className={styles.form}>
         <h2 className={styles.login_title}>Login</h2>
         <div className={styles.login_wrapper}>
-          <label className={styles.login_label} htmlFor="username">
+          <label className={styles.login_label} htmlFor="name">
             Name
           </label>
           <input
             className={styles.login_input}
             id="name"
             type="text"
-            value={username}
-            onChange={(e) => setName(e.target.value)}
+            value={name}
+            onChange={(e) => {
+              handleChange(e.target.value, "name");
+            }}
             required
           />
 
-          <label className={styles.login_label} htmlFor="username">
-            Username
+          <label className={styles.login_label} htmlFor="email">
+            Email
           </label>
           <input
             className={styles.login_input}
-            id="username"
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => handleChange(e.target.value, "email")}
             required
           />
 
@@ -51,8 +100,8 @@ const Register = () => {
             className={styles.login_input}
             id="password"
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={password.password}
+            onChange={(e) => handleChange(e.target.value, "password")}
             required
           />
 
@@ -61,16 +110,21 @@ const Register = () => {
           </label>
           <input
             className={styles.login_input}
-            id="password"
+            id="confirmPassword"
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={password.confirmPassword}
+            onChange={(e) => handleChange(e.target.value, "confirmPassword")}
             required
           />
         </div>
         <button className={styles.login_button} type="submit">
           Login
         </button>
+        {error && (
+          <span className={styles.login_error_message}>
+            Passwords do not match, please try again
+          </span>
+        )}
       </form>
     </div>
   );

@@ -2,15 +2,38 @@
 
 import { useState } from "react";
 import styles from "./login.module.css";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const fetchLogin = async (email: string, password: string) => {
+    const response = await fetch("http://localhost:8080/v1/api/login", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to login user");
+    }
+    return response.json();
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Username:", username);
-    console.log("Password:", password);
+
+    await fetchLogin(email, password);
+
+    await router.push("/home");
   };
 
   return (
@@ -18,15 +41,15 @@ const Login = () => {
       <form onSubmit={handleSubmit} className={styles.form}>
         <h2 className={styles.login_title}>Login</h2>
         <div className={styles.login_wrapper}>
-          <label className={styles.login_label} htmlFor="username">
-            Username
+          <label className={styles.login_label} htmlFor="email">
+            Email
           </label>
           <input
             className={styles.login_input}
-            id="username"
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
 
