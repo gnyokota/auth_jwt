@@ -29,7 +29,10 @@ class AuthController(private val authService: AuthService) {
         val jwt = authService.checkLogin(loginBody) ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
         val cookie = Cookie("jwt", jwt)
         cookie.isHttpOnly = true
-        response.addCookie(cookie)
+        response.setHeader(
+            "Set-Cookie",
+            "token=$jwt; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=3600"
+        )
         return ResponseEntity.ok().build()
     }
 

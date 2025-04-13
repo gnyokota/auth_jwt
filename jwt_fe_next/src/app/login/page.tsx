@@ -25,15 +25,17 @@ const Login = () => {
     if (!response.ok) {
       throw new Error("Failed to login user");
     }
-    return response.json();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    await fetchLogin(email, password);
-
-    await router.push("/home");
+    try {
+      await fetchLogin(email, password);
+      await router.push("/");
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
   };
 
   return (
