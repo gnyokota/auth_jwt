@@ -30,6 +30,25 @@ const Login = () => {
     }
   };
 
+  const fetchLogout = async (email: string) => {
+    const response = await fetch("http://localhost:8080/v1/api/logout", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+      }),
+    });
+
+    setError(!response.ok);
+
+    if (!response.ok) {
+      throw new Error("Failed to login user");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -39,6 +58,16 @@ const Login = () => {
       await router.push("/");
     } catch (error) {
       console.error("Login failed:", error);
+    }
+  };
+
+  const handleLogoutSubmit = async () => {
+    try {
+      const email = localStorage.getItem("email") ?? "";
+      await fetchLogout(email);
+      await router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
     }
   };
 
@@ -71,7 +100,11 @@ const Login = () => {
             required
           />
         </div>
-        <button className={styles.login_button} type="submit">
+        <button
+          className={styles.login_button}
+          onChange={handleLogoutSubmit}
+          type="submit"
+        >
           Login
         </button>
         {error && (

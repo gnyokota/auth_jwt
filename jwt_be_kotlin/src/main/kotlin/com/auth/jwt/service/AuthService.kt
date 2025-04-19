@@ -38,6 +38,14 @@ class AuthService(private val userRepository: UserRepository) {
         return null
     }
 
+    fun checkLogout(email:String): String? {
+        val user = userRepository.findByEmail(email)
+        if(user != null) {
+            return "jwt"
+        }
+        return null
+    }
+
     fun getUser(email:String, cookieValue: String): UserModel? {
         val body = Jwts.parser().setSigningKey(secret).build().parseSignedClaims(cookieValue).body
         if(body.issuer != email){

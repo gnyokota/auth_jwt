@@ -44,6 +44,18 @@ class AuthController(private val authService: AuthService) {
         return ResponseEntity.ok(user)
     }
 
+    @PostMapping("/logout")
+    fun logout(@RequestBody email: String, response: HttpServletResponse): ResponseEntity<Unit> {
+        val jwt = authService.checkLogout(email)
+        if(jwt == "jwt") {
+            val cookie = Cookie("jwt", null)
+            cookie.isHttpOnly = true
+            response.addCookie(cookie)
+            return ResponseEntity.ok().build()
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build()
+    }
+
     @DeleteMapping("/user/delete")
     fun deleteUser(@RequestBody emailBody: EmailDto, @CookieValue("jwt") jwtCookie: String?): ResponseEntity<String> {
         if (jwtCookie == null) {
