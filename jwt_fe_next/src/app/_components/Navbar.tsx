@@ -22,7 +22,7 @@ const Navbar = () => {
         <Link className={styles.navbar_link} href="/login">
           Login
         </Link>
-        <button className={styles.navbar_link} onClick={handleLogout}>
+        <button className={styles.navbar_button} onClick={handleLogout}>
           Logout
         </button>
       </div>
